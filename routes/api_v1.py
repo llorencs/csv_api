@@ -13,7 +13,8 @@ route_v1 = fastapi.APIRouter(prefix='/v1',
 @route_v1.post('/download', response_model=CSVModelResponse, 
                status_code=fastapi.status.HTTP_201_CREATED,
                responses={400: {'model': ErrorResponse},
-                          409: {'model': ErrorResponse}
+                          409: {'model': ErrorResponse}, 
+                          404: {'model': ErrorResponse}
                           } 
                )
 async def get_csv(csv_download: CSVModel) -> CSVModelResponse:
@@ -34,6 +35,8 @@ async def get_csv(csv_download: CSVModel) -> CSVModelResponse:
             return JSONResponse(status_code=400, content=jsonable_encoder(ErrorResponse(
                         status=409, 
                         message=f'{err}')))
+    if res.status_code == 200:
+        store_file(res.text)
 
 
 @route_v1.get('/files/{topic}')
