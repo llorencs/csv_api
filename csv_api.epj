@@ -2,7 +2,7 @@
   "header": {
     "comment": "eric project file for project csv_api",
     "copyright": "Copyright (C) 2022 Lloren\u00e7 Suau, lsuau@translations.com",
-    "saved": "2022-07-20, 09:58:37"
+    "saved": "2022-07-20, 17:00:41"
   },
   "project": {
     "AUTHOR": "Lloren\u00e7 Suau",
@@ -69,8 +69,18 @@
     },
     "RESOURCES": [],
     "SOURCES": [
+      "__init__.py",
       "main.py",
-      "__init__.py"
+      "modules/__init__.py",
+      "modules/logger.py",
+      "models/__init__.py",
+      "routes/__init__.py",
+      "routes/api_v1.py",
+      "db/__init__.py",
+      "db/mongo_client.py",
+      "models/csv_models.py",
+      "tests/__init__.py",
+      "modules/csv_ops.py"
     ],
     "SPELLEXCLUDES": "",
     "SPELLLANGUAGE": "en_US",
