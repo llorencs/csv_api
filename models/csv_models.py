@@ -23,6 +23,7 @@ class HeaderModel(BaseModel):
 
 
 class HeaderModelResponse(HeaderModel):
+    id: str
     header: list[str]
 
 

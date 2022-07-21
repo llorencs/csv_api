@@ -2,6 +2,9 @@
 import requests
 from requests import Response
 import re
+from db.mongo_client import *
+from .logger import logger
+from pathlib import Path
 
 
 def download_csv(url: str) -> Response:
@@ -34,11 +37,11 @@ def get_name(url: str) -> str:
     Returns:
         bool: DESCRIPTION
     """
-    reg_expr = r'?i(http(s)?):\S*/(?P<name>\S+?\.csv)'
+    reg_expr = r'(?i)(http(s)?):\S*/(?P<name>\S+?\.csv)'
     pat = re.compile(reg_expr)
-    res = pat.match(reg_expr)
+    res = pat.search(url)
     if res:
-        return res.get('name')
+        return res.group('name')
 
 
 def read_header(document: str) -> list[str]:
@@ -53,3 +56,32 @@ def read_header(document: str) -> list[str]:
     """
     lines = document.split('\n')
     return lines[0].replace('"', '').split(',')
+
+
+async def store_file(document: str, url: str, topic: str) -> dict:
+    """
+    Store the file in the file system and database
+    
+    @param document The contents of the file to be stored
+    @type str
+    @param url The url of the file to be stored in the database
+    @type str
+    """
+    res = await insert({'url':  url, 'topic': topic,
+                    'header': read_header(document),
+                    'name': get_name(url)},
+                                 'csvfiles')
+    logger.debug(f'New item: {res.inserted_id}, Acknowledged: {res.acknowledged}')
+    folder = Path(f'files/{res.inserted_id}')
+    name = get_name(url)
+    folder.mkdir(parents=True, exist_ok=True)
+    logger.debug(f'URL: {url} and name: {name}')
+    with Path(folder, name).open('w', encoding='utf-8') as fhandle:
+        fhandle.write(document)
+    return await get_document(res.inserted_id, 'csvfiles')
+
+
+if __name__ == '__main__':
+    res= insert({'url': 'https://datagrams/open.csv', 'topic': 'testing'}, 'csvfiles')
+    print(res)
+    

@@ -17,6 +17,7 @@ password = getenv('MONGOPASSWORD')
 SERVER_PROD = f'mongodb://{username}:{password}@mongo:27017'
 
 environment = getenv('MONGOENV')
+environment='testing'
 if environment == 'testing':
     TESTING = True
 else:
@@ -67,7 +68,7 @@ async def get_document(id: Any, collection: Any):
     """
     Find a document with the specified id in the specified collection
     """
-    document= await db[collection].find_one({'id': {'$eq': id}})
+    document= await db[collection].find_one({'_id': {'$eq': id}})
     return document
 
 

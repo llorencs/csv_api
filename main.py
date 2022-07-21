@@ -6,6 +6,7 @@ import uvicorn
 from routes.api_v1 import route_v1
 from modules.logger import logger
 
+
 logger.debug('Start of the run')
 
 app = FastAPI(title='CSVTools',
