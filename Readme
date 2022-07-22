@@ -1,0 +1,47 @@
+To install the application you need to run the docker compose with the command docker-compose up
+
+The tool has been developd with FastAPI.
+
+To store the information of the CSV files is using a MongoDB database.
+
+I have created 3 endpoints.
+
+- To download the csv:
+POST /api/v1/download
+
+With body as JSON:
+    - url: The url where the CSV file is located. It requires full path for example: https://vincentarelbundock.github.io/Rdatasets/csv/drc/terbuthylazin.csv
+    - topic: The name of the topic.
+    Example of the body:
+        {"url": "https://vincentarelbundock.github.io/Rdatasets/csv/drc/terbuthylazin.csv",
+        "topic": "Accidents"
+        }
+
+- Filter CSV files by topic
+GET /api/v1/files/{topic}
+    - Topic of the CSV files to be filtered
+    It is case sensitive.
+
+- Get the CSV header of a file
+POST /api/v1/header
+
+Body JSON:
+    - id (Optional): The ID of the CSV to pull
+    - Name (Optional): The name of the CSV that would be something like: terbuthylazin.csv.
+    Is required to give the ID or the Name. If they are given both or none it will return an error 400.
+
+Response:
+    - It returns a JSON containing the header as an Array and the name and ID of the file.
+
+
+- Decisions:
+    I have decided to store some of the basic information of the CSV in the download operation,
+    like storing the header in the database. As it is an information that will be accessed many times,
+    And instead of having to read the file every time that this is requested, it is only read the first time
+    during the download.
+
+    - To process the header I decided to read it as text file and read the first line of the CSV. Instead of
+    using the CSV library.
+
+Spent time:
+    - About 2 hours. 

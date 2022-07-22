@@ -14,7 +14,7 @@ app = FastAPI(title='CSVTools',
                 version='v1'
                 )
 
-app.mount('/api', route_v1)
+app.mount('/api/v1', route_v1)
 
 
 origins = ["*"]

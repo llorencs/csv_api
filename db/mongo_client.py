@@ -17,7 +17,7 @@ password = getenv('MONGOPASSWORD')
 SERVER_PROD = f'mongodb://{username}:{password}@mongo:27017'
 
 environment = getenv('MONGOENV')
-environment='testing'
+#environment='testing'
 if environment == 'testing':
     TESTING = True
 else:

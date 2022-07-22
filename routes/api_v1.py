@@ -22,10 +22,9 @@ route_v1 = fastapi.APIRouter(prefix='/v1',
 async def get_csv(csv_download: CSVModel) -> CSVModelResponse:
     """
     Download the CSV from a specific URL.
-    Args:
-        csv_download (CSVModel):
-            URL: URL where the CSV file is located
-            topic: The topic of the CSV.
+    Body:
+        **url**: URL where download the CSV file
+        **topic**: Topic of the CSV file
     
     Returns:
         CSVModelResponse: DESCRIPTION
@@ -46,14 +45,24 @@ async def get_csv(csv_download: CSVModel) -> CSVModelResponse:
                                 )
 
 
-@route_v1.get('/files/{topic}')
+@route_v1.get('/files/{topic}', status_code=fastapi.status.HTTP_200_OK,
+              responses={404: {'model': ErrorResponse}
+                         })
 async def get_files(topic: str) -> list[CSVModelResponse]:
     """
     Get files based on topic
     
     *topic**: The topic of the files to get.
     """
-    pass
+    docs = await find_many(key='topic',value=topic,collection='csvfiles')
+    if not docs:
+        return JSONResponse(status_code=404, content=jsonable_encoder(ErrorResponse(
+                        status_code=404, 
+                        message=f'Documents of topic <{topic}> have not been found.')))
+    return [CSVModelResponse(url= doc.get('url'),
+                             topic=doc.get('topic'),
+                             id=str(doc.get('_id'))
+                             ) for doc in docs]
 
 
 @route_v1.post('/header', response_model=HeaderModelResponse, 
@@ -85,7 +94,8 @@ async def get_header(h: HeaderModel) -> HeaderModelResponse:
         doc = await get_document(h.id, 'csvfiles')
     logger.debug(f'Doc: {doc} id: {h.id} name: {h.name}')
     if doc:
-        return HeaderModelResponse(id= doc.get('_id'), 
+        return HeaderModelResponse(id= str(doc.get('_id')),
+                                   name=doc.get('name'), 
                                    header=doc.get('header'))
     else:
         return JSONResponse(status_code=404, content=jsonable_encoder(ErrorResponse(
